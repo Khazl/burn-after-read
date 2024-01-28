@@ -1,7 +1,8 @@
 ## What is this?
 
-...
+<img src="./resources/img/burn-after-read.jpg" alt="UI preview">
 
+...
 
 ## Installation
 
