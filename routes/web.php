@@ -26,7 +26,7 @@ Route::post('/create', function () {
     $message->token = Str::random(16);
     $message->password = request()->password ? Hash::make(request()->password) : null;
     $message->content = Crypt::encrypt(request()->message);
-    $message->expires_at = null;
+    $message->expires_at = request()->expires ? now()->addHours(request()->expires) : null;
     $message->save();
 
     return redirect('/created/' . $message->token);
@@ -73,7 +73,6 @@ Route::any('/message/{token}', function (String $token) {
     $content = Crypt::decrypt($message->content);
     $deleted = false;
 
-    // TODO: Determine if message is deleted
     if ($message->expires_at === null) {
         $message->delete();
         $deleted = true;
