@@ -71,14 +71,16 @@ Route::any('/message/{token}', function (String $token) {
     }
 
     $content = Crypt::decrypt($message->content);
+    $deleted = false;
 
     // TODO: Determine if message is deleted
     if ($message->expires_at === null) {
         $message->delete();
+        $deleted = true;
     }
 
     return view('message', [
         'message' => $content,
-        'deleted' => false,
+        'deleted' => $deleted,
     ]);
 });
