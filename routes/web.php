@@ -73,6 +73,7 @@ Route::any('/message/{token}', function (String $token) {
     $content = Crypt::decrypt($message->content);
     $deleted = false;
 
+    // Delete message if lifetime was set to 1 read
     if ($message->expires_at === null) {
         $message->delete();
         $deleted = true;
