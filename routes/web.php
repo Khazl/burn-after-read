@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Message;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,10 +22,14 @@ Route::get('/', function () {
 });
 
 Route::post('/create', function () {
-    // TODO: Create a new message and redirect with token
+    $message = new Message();
+    $message->token = Str::random(16);
+    $message->password = request()->password ? Hash::make(request()->password) : null;
+    $message->content = Crypt::encrypt(request()->message);
+    $message->expires_at = null;
+    $message->save();
 
-    $token = 1234;
-    return redirect('/created/' . $token);
+    return redirect('/created/' . $message->token);
 });
 
 Route::get('/created/{token}', function (String $token) {
@@ -32,13 +39,15 @@ Route::get('/created/{token}', function (String $token) {
 });
 
 Route::any('/message/{token}', function (String $token) {
-    // TODO: Get message from token
-    $message = (object) ['password' => Hash::make('secret')]; // password required
-    // $message = (object) ['password' => null]; // password not required
-
     // Abort if not allowed method
     if (!request()->isMethod('post') && !request()->isMethod('get')) {
         abort(405);
+    }
+
+    // Abort if message does not exist
+    $message = Message::where('token', $token)->first();
+    if ($message === null) {
+        abort(404);
     }
 
     // Ask for password if message is password protected and request is GET
@@ -61,9 +70,15 @@ Route::any('/message/{token}', function (String $token) {
         ]);
     }
 
+    $content = Crypt::decrypt($message->content);
+
     // TODO: Determine if message is deleted
+    if ($message->expires_at === null) {
+        $message->delete();
+    }
+
     return view('message', [
-        'message' => 'Lorem Ipsum dolor sit amet ...',
+        'message' => $content,
         'deleted' => false,
     ]);
 });
