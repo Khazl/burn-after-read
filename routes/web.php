@@ -25,7 +25,7 @@ Route::post('/create', function () {
     $message = new Message();
     $message->token = Str::random(16);
     $message->password = request()->password ? Hash::make(request()->password) : null;
-    $message->content = Crypt::encrypt(request()->message);
+    $message->content = Crypt::encryptString(request()->message);
     $message->expires_at = intval(request()->expires) ? now()->addHours(request()->expires) : null;
     $message->save();
 
@@ -70,7 +70,7 @@ Route::any('/message/{token}', function (String $token) {
         ]);
     }
 
-    $content = Crypt::decrypt($message->content);
+    $content = Crypt::decryptString($message->content);
     $deleted = false;
 
     // Delete message if lifetime was set to 1 read
