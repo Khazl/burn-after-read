@@ -1,3 +1,7 @@
+# Burn after read
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## What is this?
 
 <img src="./resources/img/burn-after-read.jpg" alt="UI preview">
